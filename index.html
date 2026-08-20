@@ -14,11 +14,12 @@
   --accent: #ff81d4;
   --base: #fcf4f0;
   --sub-base: #f1b6f5;
-  --dark: #2d2d2d;
+  --dark: #444;
   --mid: #555;
   --light-text: #fff;
   --radius: 14px;
   --shadow: 0 4px 20px rgba(0,0,0,0.08);
+  --special: #f5a623;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -30,7 +31,6 @@ body {
   min-height: 100vh;
 }
 
-/* ── Header ── */
 .header {
   background: linear-gradient(135deg, var(--main), var(--sub));
   color: var(--light-text);
@@ -57,15 +57,14 @@ body {
   transition: background 0.2s;
 }
 .header-btn:hover { background: rgba(255,255,255,0.35); }
-.header-btn.active { background: rgba(255,255,255,0.95); color: var(--dark); }
 
-/* ── Tabs ── */
 .tab-bar {
   display: flex;
   gap: 0;
   background: #fff;
   border-bottom: 2px solid #eee;
   padding: 0 24px;
+  overflow-x: auto;
 }
 .tab {
   padding: 14px 24px;
@@ -77,16 +76,15 @@ body {
   color: var(--mid);
   border-bottom: 3px solid transparent;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 .tab:hover { color: var(--dark); }
 .tab.active { color: var(--main); border-bottom-color: var(--main); }
 
-/* ── Layout ── */
 .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
 .panel { display: none; }
 .panel.visible { display: block; }
 
-/* ── Cards ── */
 .card {
   background: #fff;
   border-radius: var(--radius);
@@ -108,8 +106,7 @@ body {
   display: inline-block;
 }
 
-/* ── KPI row ── */
-.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 24px; }
 .kpi {
   background: #fff;
   border-radius: var(--radius);
@@ -117,17 +114,18 @@ body {
   box-shadow: var(--shadow);
   text-align: center;
 }
-.kpi-value { font-size: 36px; font-weight: 900; line-height: 1.1; }
-.kpi-label { font-size: 12px; color: var(--mid); margin-top: 4px; font-weight: 600; }
+.kpi-value { font-size: 34px; font-weight: 900; line-height: 1.1; }
+.kpi-label { font-size: 11px; color: var(--mid); margin-top: 4px; font-weight: 600; }
 .kpi.highlight { background: linear-gradient(135deg, var(--main), var(--sub)); color: #fff; }
 .kpi.highlight .kpi-label { color: rgba(255,255,255,0.8); }
 .kpi.accent-bg { background: var(--accent); color: #fff; }
 .kpi.accent-bg .kpi-label { color: rgba(255,255,255,0.8); }
+.kpi.special-bg { background: var(--special); color: #fff; }
+.kpi.special-bg .kpi-label { color: rgba(255,255,255,0.8); }
 
-/* ── Form ── */
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 14px;
 }
 .form-group label {
@@ -165,14 +163,14 @@ body {
 .btn-primary { background: var(--main); color: #fff; }
 .btn-primary:hover { box-shadow: 0 4px 16px rgba(102,206,197,0.4); }
 .btn-accent { background: var(--accent); color: #fff; }
+.btn-special { background: var(--special); color: #fff; }
 .btn-danger { background: #ff6b6b; color: #fff; }
 .btn-sm { padding: 6px 14px; font-size: 12px; }
 
-/* ── Table ── */
 .table-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
 thead th {
-  background: var(--dark);
+  background: #6b6b6b;
   color: #fff;
   padding: 10px 12px;
   text-align: left;
@@ -183,6 +181,8 @@ thead th:first-child { border-radius: 10px 0 0 0; }
 thead th:last-child { border-radius: 0 10px 0 0; }
 tbody td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; }
 tbody tr:hover { background: rgba(102,206,197,0.06); }
+tbody tr.special-row { background: rgba(245,166,35,0.06); }
+tbody tr.special-row:hover { background: rgba(245,166,35,0.12); }
 .badge {
   display: inline-block;
   padding: 3px 10px;
@@ -193,12 +193,11 @@ tbody tr:hover { background: rgba(102,206,197,0.06); }
 .badge-open { background: var(--main); color: #fff; }
 .badge-gone { background: #ccc; color: #666; }
 .badge-focus { background: var(--accent); color: #fff; }
+.badge-special { background: var(--special); color: #fff; }
 
-/* ── Charts ── */
-.chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; }
+.chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
 .chart-box { position: relative; height: 280px; }
 
-/* ── Setup ── */
 .setup-overlay {
   position: fixed; inset: 0;
   background: rgba(0,0,0,0.5);
@@ -218,7 +217,6 @@ tbody tr:hover { background: rgba(102,206,197,0.06); }
 .setup-card h2 { font-size: 20px; font-weight: 900; margin-bottom: 8px; }
 .setup-card p { font-size: 13px; color: var(--mid); margin-bottom: 20px; line-height: 1.6; }
 
-/* ── Toast ── */
 .toast {
   position: fixed;
   bottom: 30px;
@@ -236,8 +234,7 @@ tbody tr:hover { background: rgba(102,206,197,0.06); }
 }
 .toast.show { transform: translateX(-50%) translateY(0); }
 
-/* ── Filter pills ── */
-.filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
 .pill {
   padding: 6px 16px;
   border-radius: 20px;
@@ -252,6 +249,31 @@ tbody tr:hover { background: rgba(102,206,197,0.06); }
 .pill.active { background: var(--main); color: #fff; border-color: var(--main); }
 .pill.focus-type { border-color: var(--accent); }
 .pill.focus-type.active { background: var(--accent); border-color: var(--accent); }
+.pill.special-type { border-color: var(--special); }
+.pill.special-type.active { background: var(--special); border-color: var(--special); }
+.sep { width: 1px; height: 24px; background: #ddd; }
+
+.toggle-row { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+.toggle-label { font-size: 12px; font-weight: 700; color: var(--mid); }
+.toggle {
+  position: relative;
+  width: 44px; height: 24px;
+  background: #ddd;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.toggle.on { background: var(--special); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 20px; height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+.toggle.on::after { transform: translateX(20px); }
 
 @media (max-width: 600px) {
   .header { padding: 16px; }
@@ -261,32 +283,26 @@ tbody tr:hover { background: rgba(102,206,197,0.06); }
   .form-grid { grid-template-columns: 1fr 1fr; }
   .chart-grid { grid-template-columns: 1fr; }
   .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .tab { padding: 12px 16px; font-size: 13px; }
 }
 </style>
 </head>
 <body>
 
-<!-- Setup -->
 <div id="setupOverlay" class="setup-overlay" style="display:none;">
   <div class="setup-card">
-    <h2>🔑 接続設定</h2>
-    <p>GitHub Personal Access Token（gistスコープ）を入力。<br>初回のみ。localStorageに保存される。</p>
-    <div class="form-group" style="margin-bottom:14px;">
+    <h2>🔑 トークン入力</h2>
+    <p>GitHub PAT（gistスコープ）を入力。<br>このデバイスで1回だけ。</p>
+    <div class="form-group" style="margin-bottom:18px;">
       <label>GitHub PAT</label>
       <input type="password" id="inputToken" placeholder="ghp_xxxx...">
-    </div>
-    <div class="form-group" style="margin-bottom:14px;">
-      <label>Gist ID（既存があれば。空なら新規作成）</label>
-      <input type="text" id="inputGistId" placeholder="空欄で自動作成">
     </div>
     <button class="btn btn-primary" onclick="saveSetup()" style="width:100%;">接続</button>
   </div>
 </div>
 
-<!-- Toast -->
 <div id="toast" class="toast"></div>
 
-<!-- Header -->
 <div class="header">
   <h1>UR空き追跡</h1>
   <div class="header-right">
@@ -296,17 +312,16 @@ tbody tr:hover { background: rgba(102,206,197,0.06); }
   </div>
 </div>
 
-<!-- Tabs -->
 <div class="tab-bar">
-  <button class="tab active" onclick="switchTab('dashboard')">ダッシュボード</button>
-  <button class="tab" onclick="switchTab('entry')">入力</button>
-  <button class="tab" onclick="switchTab('table')">一覧</button>
-  <button class="tab" onclick="switchTab('stats')">統計</button>
+  <button class="tab active" data-tab="dashboard" onclick="switchTab('dashboard',this)">ダッシュボード</button>
+  <button class="tab" data-tab="entry" onclick="switchTab('entry',this)">入力</button>
+  <button class="tab" data-tab="table" onclick="switchTab('table',this)">一覧</button>
+  <button class="tab" data-tab="stats" onclick="switchTab('stats',this)">統計</button>
 </div>
 
 <div class="container">
 
-<!-- ━━ Dashboard ━━ -->
+<!-- Dashboard -->
 <div id="panel-dashboard" class="panel visible">
   <div class="kpi-row" id="kpiRow"></div>
   <div class="chart-grid">
@@ -321,16 +336,21 @@ tbody tr:hover { background: rgba(102,206,197,0.06); }
   </div>
 </div>
 
-<!-- ━━ Entry ━━ -->
+<!-- Entry -->
 <div id="panel-entry" class="panel">
   <div class="card">
     <div class="card-title"><span class="dot" style="background:var(--sub)"></span>新規 / 更新</div>
     <div class="form-grid">
       <div class="form-group">
-        <label>号館</label>
-        <select id="fBuilding">
-          <option value="">選択</option>
+        <label>区分</label>
+        <select id="fType">
+          <option value="通常">通常</option>
+          <option value="特別">特別</option>
         </select>
+      </div>
+      <div class="form-group">
+        <label>号館</label>
+        <select id="fBuilding"><option value="">選択</option></select>
       </div>
       <div class="form-group">
         <label>部屋番号</label>
@@ -359,18 +379,19 @@ tbody tr:hover { background: rgba(102,206,197,0.06); }
         <input type="date" id="fInquired">
       </div>
     </div>
-    <div style="margin-top:18px; display:flex; gap:10px;">
+    <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;">
       <button class="btn btn-primary" onclick="addEntry()">追加</button>
       <button class="btn btn-accent" onclick="markGone()">選択を契約済みに</button>
+      <button class="btn btn-special" onclick="convertToNormal()">特別→通常に切替</button>
     </div>
   </div>
-  <div class="card" id="recentCard">
+  <div class="card">
     <div class="card-title"><span class="dot" style="background:var(--accent)"></span>最近の入力</div>
     <div id="recentList"></div>
   </div>
 </div>
 
-<!-- ━━ Table ━━ -->
+<!-- Table -->
 <div id="panel-table" class="panel">
   <div class="card">
     <div class="filter-row" id="filterRow"></div>
@@ -378,7 +399,7 @@ tbody tr:hover { background: rgba(102,206,197,0.06); }
       <table>
         <thead>
           <tr>
-            <th>号館</th><th>部屋</th><th>間取り</th><th>階</th><th>グループ</th>
+            <th>区分</th><th>号館</th><th>部屋</th><th>間取り</th><th>階</th><th>グループ</th>
             <th>出現日</th><th>消滅日</th><th>滞留日数</th><th>状態</th><th></th>
           </tr>
         </thead>
@@ -388,8 +409,12 @@ tbody tr:hover { background: rgba(102,206,197,0.06); }
   </div>
 </div>
 
-<!-- ━━ Stats ━━ -->
+<!-- Stats -->
 <div id="panel-stats" class="panel">
+  <div class="toggle-row">
+    <span class="toggle-label">特別枠を含む</span>
+    <div class="toggle" id="toggleSpecial" onclick="toggleSpecial()"></div>
+  </div>
   <div class="chart-grid">
     <div class="card">
       <div class="card-title"><span class="dot" style="background:var(--main)"></span>曜日別 空き出現</div>
@@ -404,7 +429,7 @@ tbody tr:hover { background: rgba(102,206,197,0.06); }
       <div class="chart-box"><canvas id="chartSizeRetention"></canvas></div>
     </div>
     <div class="card">
-      <div class="card-title"><span class="dot" style="background:var(--sub-base)"></span>グループ別 回転率（契約済み率）</div>
+      <div class="card-title"><span class="dot" style="background:var(--sub-base)"></span>グループ別 回転率</div>
       <div class="chart-box"><canvas id="chartGroupRotation"></canvas></div>
     </div>
   </div>
@@ -415,18 +440,24 @@ tbody tr:hover { background: rgba(102,206,197,0.06); }
       <div class="chart-box"><canvas id="chartFocusDow"></canvas></div>
     </div>
   </div>
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--main)"></span>棟別 空き出現数</div>
+    <div class="chart-box" style="height:320px;"><canvas id="chartBuilding"></canvas></div>
+  </div>
 </div>
 
-</div><!-- /container -->
+</div>
 
 <script>
-// ─── State ───
-let DATA = [];
-let GIST_ID = localStorage.getItem('ur_gist_id') || '';
-let TOKEN = localStorage.getItem('ur_token') || '';
+// ─── Config ───
+const GIST_ID = '5ae498eba5ff2eb1453965f778e8b884';
 const FILENAME = 'ur_data.json';
 const BUILDINGS = [1,2,3,4,5,6,7,8,11,12,13,14,15,16,17,18,19,21,22,23,24];
 const FOCUS_SIZES = ['1LDK','2DK'];
+
+let DATA = [];
+let TOKEN = localStorage.getItem('ur_token') || '';
+let includeSpecial = false;
 
 function getGroup(b) {
   if (b >= 1 && b <= 8) return 'A';
@@ -440,9 +471,8 @@ function daysBetween(a, b) {
   const end = b ? new Date(b) : new Date();
   return Math.max(0, Math.round((end - new Date(a)) / 86400000));
 }
-function dowName(d) { return ['日','月','火','水','木','金','土'][new Date(d).getDay()]; }
 
-// ─── Init building select ───
+// Init building select
 (function(){
   const sel = document.getElementById('fBuilding');
   BUILDINGS.forEach(b => {
@@ -463,60 +493,42 @@ function toast(msg) {
 }
 
 // ─── Tabs ───
-function switchTab(name) {
+function switchTab(name, el) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('visible'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('panel-' + name).classList.add('visible');
-  event.target.classList.add('active');
+  if (el) el.classList.add('active');
   if (name === 'dashboard') renderDashboard();
   if (name === 'table') renderTable();
   if (name === 'stats') renderStats();
+  if (name === 'entry') renderRecent();
 }
 
 // ─── Setup ───
 function showSetup() { document.getElementById('setupOverlay').style.display = 'flex'; }
 function hideSetup() { document.getElementById('setupOverlay').style.display = 'none'; }
-async function saveSetup() {
+function saveSetup() {
   TOKEN = document.getElementById('inputToken').value.trim();
-  GIST_ID = document.getElementById('inputGistId').value.trim();
   if (!TOKEN) { toast('トークンを入力'); return; }
   localStorage.setItem('ur_token', TOKEN);
-  if (GIST_ID) {
-    localStorage.setItem('ur_gist_id', GIST_ID);
-    hideSetup();
-    await syncData();
-  } else {
-    // Create new gist
-    try {
-      const res = await fetch('https://api.github.com/gists', {
-        method: 'POST',
-        headers: { 'Authorization': 'token ' + TOKEN, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          description: 'UR Vacancy Tracker Data',
-          public: false,
-          files: { [FILENAME]: { content: '[]' } }
-        })
-      });
-      const g = await res.json();
-      GIST_ID = g.id;
-      localStorage.setItem('ur_gist_id', GIST_ID);
-      toast('Gist作成完了: ' + GIST_ID.slice(0,8) + '...');
-      hideSetup();
-    } catch(e) { toast('Gist作成失敗'); }
-  }
+  hideSetup();
+  syncData();
 }
 
 // ─── Sync ───
 async function syncData() {
-  if (!TOKEN || !GIST_ID) { showSetup(); return; }
+  if (!TOKEN) { showSetup(); return; }
   document.getElementById('syncStatus').textContent = '同期中...';
   try {
     const res = await fetch('https://api.github.com/gists/' + GIST_ID, {
       headers: { 'Authorization': 'token ' + TOKEN }
     });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     const g = await res.json();
     const content = g.files[FILENAME]?.content || '[]';
     DATA = JSON.parse(content);
+    // Migrate: add type field if missing
+    DATA.forEach(d => { if (!d.type) d.type = '通常'; });
     document.getElementById('syncStatus').textContent = '✓ ' + new Date().toLocaleTimeString('ja-JP');
     renderDashboard();
     toast('同期完了 (' + DATA.length + '件)');
@@ -527,7 +539,7 @@ async function syncData() {
 }
 
 async function pushData() {
-  if (!TOKEN || !GIST_ID) return;
+  if (!TOKEN) return;
   try {
     await fetch('https://api.github.com/gists/' + GIST_ID, {
       method: 'PATCH',
@@ -540,6 +552,7 @@ async function pushData() {
 
 // ─── Entry ───
 function addEntry() {
+  const type = document.getElementById('fType').value;
   const b = parseInt(document.getElementById('fBuilding').value);
   const room = document.getElementById('fRoom').value.trim();
   const size = document.getElementById('fSize').value;
@@ -548,14 +561,14 @@ function addEntry() {
   const inquired = document.getElementById('fInquired').value;
   if (!b || !room || !size || !appeared) { toast('号館・部屋・間取り・出現日は必須'); return; }
 
-  // Check duplicate
   const existing = DATA.findIndex(d => d.building === b && d.room === room && d.date_appeared === appeared);
   if (existing >= 0) {
-    DATA[existing] = { ...DATA[existing], size, date_gone: gone, date_inquired: inquired };
+    DATA[existing] = { ...DATA[existing], type, size, date_gone: gone, date_inquired: inquired };
     toast('更新しました');
   } else {
     DATA.push({
       id: Date.now().toString(36),
+      type: type,
       building: b,
       room: room,
       size: size,
@@ -583,6 +596,18 @@ function markGone() {
   renderRecent();
 }
 
+function convertToNormal() {
+  const b = parseInt(document.getElementById('fBuilding').value);
+  const room = document.getElementById('fRoom').value.trim();
+  if (!b || !room) { toast('号館と部屋番号を指定'); return; }
+  const idx = DATA.findIndex(d => d.building === b && d.room === room && d.type === '特別');
+  if (idx < 0) { toast('該当する特別枠なし'); return; }
+  DATA[idx].type = '通常';
+  pushData();
+  toast(b + '号館 ' + room + ' → 通常に切替');
+  renderRecent();
+}
+
 function deleteEntry(id) {
   DATA = DATA.filter(d => d.id !== id);
   pushData();
@@ -596,8 +621,10 @@ function renderRecent() {
   if (!recent.length) { el.innerHTML = '<p style="color:#999;font-size:13px;">データなし</p>'; return; }
   el.innerHTML = recent.map(d => {
     const isFocus = FOCUS_SIZES.includes(d.size);
+    const isSpecial = d.type === '特別';
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0;">
       <div>
+        ${isSpecial ? '<span class="badge badge-special" style="margin-right:6px;">特別</span>' : ''}
         <span style="font-weight:700;">${d.building}号館 ${d.room}</span>
         <span class="badge ${isFocus?'badge-focus':d.date_gone?'badge-gone':'badge-open'}" style="margin-left:8px;">${d.size}</span>
       </div>
@@ -609,18 +636,18 @@ function renderRecent() {
 // ─── Table ───
 let tableFilter = { group: 'all', status: 'all' };
 function renderFilterRow() {
-  const el = document.getElementById('filterRow');
-  el.innerHTML = `
+  document.getElementById('filterRow').innerHTML = `
     <button class="pill ${tableFilter.group==='all'?'active':''}" onclick="tableFilter.group='all';renderTable()">全棟</button>
     <button class="pill ${tableFilter.group==='A'?'active':''}" onclick="tableFilter.group='A';renderTable()">A棟群</button>
     <button class="pill ${tableFilter.group==='B'?'active':''}" onclick="tableFilter.group='B';renderTable()">B棟群</button>
     <button class="pill ${tableFilter.group==='C'?'active':''}" onclick="tableFilter.group='C';renderTable()">C棟群</button>
-    <span style="width:1px;background:#ddd;margin:0 4px;"></span>
+    <span class="sep"></span>
     <button class="pill ${tableFilter.status==='all'?'active':''}" onclick="tableFilter.status='all';renderTable()">全件</button>
     <button class="pill ${tableFilter.status==='open'?'active':''}" onclick="tableFilter.status='open';renderTable()">空き</button>
     <button class="pill ${tableFilter.status==='gone'?'active':''}" onclick="tableFilter.status='gone';renderTable()">契約済</button>
-    <span style="width:1px;background:#ddd;margin:0 4px;"></span>
+    <span class="sep"></span>
     <button class="pill focus-type ${tableFilter.status==='focus'?'active':''}" onclick="tableFilter.status='focus';renderTable()">1LDK・2DK</button>
+    <button class="pill special-type ${tableFilter.status==='special'?'active':''}" onclick="tableFilter.status='special';renderTable()">特別</button>
   `;
 }
 function renderTable() {
@@ -630,15 +657,18 @@ function renderTable() {
   if (tableFilter.status === 'open') filtered = filtered.filter(d => !d.date_gone);
   if (tableFilter.status === 'gone') filtered = filtered.filter(d => d.date_gone);
   if (tableFilter.status === 'focus') filtered = filtered.filter(d => FOCUS_SIZES.includes(d.size));
+  if (tableFilter.status === 'special') filtered = filtered.filter(d => d.type === '特別');
   filtered.sort((a,b) => a.building - b.building || a.room.localeCompare(b.room));
 
   const el = document.getElementById('tableBody');
-  if (!filtered.length) { el.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#999;padding:30px;">データなし</td></tr>'; return; }
+  if (!filtered.length) { el.innerHTML = '<tr><td colspan="11" style="text-align:center;color:#999;padding:30px;">データなし</td></tr>'; return; }
   el.innerHTML = filtered.map(d => {
     const days = daysBetween(d.date_appeared, d.date_gone);
     const isFocus = FOCUS_SIZES.includes(d.size);
+    const isSpecial = d.type === '特別';
     const status = d.date_gone ? 'gone' : 'open';
-    return `<tr>
+    return `<tr class="${isSpecial?'special-row':''}">
+      <td>${isSpecial ? '<span class="badge badge-special">特別</span>' : '通常'}</td>
       <td style="font-weight:700;">${d.building}</td>
       <td>${d.room}</td>
       <td><span class="badge ${isFocus?'badge-focus':''}">${d.size}</span></td>
@@ -653,23 +683,39 @@ function renderTable() {
   }).join('');
 }
 
+// ─── Toggle ───
+function toggleSpecial() {
+  includeSpecial = !includeSpecial;
+  document.getElementById('toggleSpecial').classList.toggle('on', includeSpecial);
+  renderStats();
+}
+
+// ─── Stat helpers ───
+function statData() {
+  return includeSpecial ? DATA : DATA.filter(d => d.type !== '特別');
+}
+
 // ─── Dashboard ───
 let chartInstances = {};
 function destroyChart(id) { if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; } }
 
 function renderDashboard() {
-  // KPIs
-  const open = DATA.filter(d => !d.date_gone);
-  const gone = DATA.filter(d => d.date_gone);
+  const all = DATA;
+  const normal = all.filter(d => d.type !== '特別');
+  const special = all.filter(d => d.type === '特別');
+  const open = normal.filter(d => !d.date_gone);
+  const gone = normal.filter(d => d.date_gone);
   const focusOpen = open.filter(d => FOCUS_SIZES.includes(d.size));
+  const specialOpen = special.filter(d => !d.date_gone);
   const avgDays = gone.length ? Math.round(gone.reduce((s,d) => s + (daysBetween(d.date_appeared,d.date_gone)||0), 0) / gone.length) : '—';
 
   document.getElementById('kpiRow').innerHTML = `
-    <div class="kpi highlight"><div class="kpi-value">${open.length}</div><div class="kpi-label">現在空き</div></div>
+    <div class="kpi highlight"><div class="kpi-value">${open.length}</div><div class="kpi-label">通常 空き</div></div>
     <div class="kpi accent-bg"><div class="kpi-value">${focusOpen.length}</div><div class="kpi-label">1LDK・2DK 空き</div></div>
+    <div class="kpi special-bg"><div class="kpi-value">${specialOpen.length}</div><div class="kpi-label">特別枠 空き</div></div>
     <div class="kpi"><div class="kpi-value">${gone.length}</div><div class="kpi-label">契約済み累計</div></div>
     <div class="kpi"><div class="kpi-value">${avgDays}</div><div class="kpi-label">平均滞留日数</div></div>
-    <div class="kpi"><div class="kpi-value">${DATA.length}</div><div class="kpi-label">全記録数</div></div>
+    <div class="kpi"><div class="kpi-value">${all.length}</div><div class="kpi-label">全記録数</div></div>
   `;
 
   // Group bar
@@ -686,15 +732,15 @@ function renderDashboard() {
         { label: '契約済', data: groupGone, backgroundColor: '#e0e0e0', borderRadius: 8 }
       ]
     },
-    options: chartOpts('棟群')
+    options: chartOpts()
   });
 
   // Focus timeline
   destroyChart('chartFocusTimeline');
-  const dates = [...new Set(DATA.map(d => d.date_appeared))].sort();
+  const dates = [...new Set(DATA.map(d => d.date_appeared).filter(Boolean))].sort();
   if (dates.length) {
-    const focus1 = dates.map(dt => DATA.filter(d => d.size === '1LDK' && d.date_appeared <= dt && (!d.date_gone || d.date_gone > dt)).length);
-    const focus2 = dates.map(dt => DATA.filter(d => d.size === '2DK' && d.date_appeared <= dt && (!d.date_gone || d.date_gone > dt)).length);
+    const focus1 = dates.map(dt => DATA.filter(d => d.size === '1LDK' && d.type !== '特別' && d.date_appeared <= dt && (!d.date_gone || d.date_gone > dt)).length);
+    const focus2 = dates.map(dt => DATA.filter(d => d.size === '2DK' && d.type !== '特別' && d.date_appeared <= dt && (!d.date_gone || d.date_gone > dt)).length);
     chartInstances['chartFocusTimeline'] = new Chart(document.getElementById('chartFocusTimeline'), {
       type: 'line',
       data: {
@@ -704,34 +750,35 @@ function renderDashboard() {
           { label: '2DK', data: focus2, borderColor: '#4c9eff', backgroundColor: 'rgba(76,158,255,0.1)', fill: true, tension: 0.3, pointRadius: 3 }
         ]
       },
-      options: chartOpts('日付')
+      options: chartOpts()
     });
   }
 }
 
 // ─── Stats ───
 function renderStats() {
-  const gone = DATA.filter(d => d.date_gone);
+  const src = statData();
+  const gone = src.filter(d => d.date_gone);
 
   // DOW
   destroyChart('chartDow');
   const dowCounts = [0,0,0,0,0,0,0];
-  DATA.forEach(d => { if(d.date_appeared) dowCounts[new Date(d.date_appeared).getDay()]++; });
+  src.forEach(d => { if(d.date_appeared) dowCounts[new Date(d.date_appeared).getDay()]++; });
   chartInstances['chartDow'] = new Chart(document.getElementById('chartDow'), {
     type: 'bar',
     data: {
       labels: ['日','月','火','水','木','金','土'],
       datasets: [{ data: dowCounts, backgroundColor: dowCounts.map((_,i) => i===0||i===6 ? '#f1b6f5' : '#66cec5'), borderRadius: 8 }]
     },
-    options: { ...chartOpts('曜日'), plugins: { legend: { display: false } } }
+    options: { ...chartOpts(), plugins: { legend: { display: false } } }
   });
 
-  // Floor rotation
+  // Floor
   destroyChart('chartFloor');
-  const floors = [...new Set(DATA.map(d => d.floor))].sort((a,b) => a - b);
+  const floors = [...new Set(src.map(d => d.floor))].sort((a,b) => a - b);
   const floorRate = floors.map(f => {
-    const total = DATA.filter(d => d.floor === f).length;
-    const goneF = DATA.filter(d => d.floor === f && d.date_gone).length;
+    const total = src.filter(d => d.floor === f).length;
+    const goneF = src.filter(d => d.floor === f && d.date_gone).length;
     return total ? Math.round(goneF / total * 100) : 0;
   });
   chartInstances['chartFloor'] = new Chart(document.getElementById('chartFloor'), {
@@ -740,7 +787,7 @@ function renderStats() {
       labels: floors.map(f => f + 'F'),
       datasets: [{ data: floorRate, backgroundColor: '#4c9eff', borderRadius: 8 }]
     },
-    options: { ...chartOpts('階', '%'), plugins: { legend: { display: false } } }
+    options: { ...chartOpts('%'), plugins: { legend: { display: false } } }
   });
 
   // Size retention
@@ -757,15 +804,15 @@ function renderStats() {
       labels: sizes,
       datasets: [{ data: sizeAvg, backgroundColor: sizes.map(s => FOCUS_SIZES.includes(s) ? '#ff81d4' : '#66cec5'), borderRadius: 8 }]
     },
-    options: { ...chartOpts('間取り', '日'), plugins: { legend: { display: false } } }
+    options: { ...chartOpts('日'), plugins: { legend: { display: false } } }
   });
 
-  // Group rotation
+  // Group rotation doughnut
   destroyChart('chartGroupRotation');
   const groups = ['A','B','C'];
   const grpRate = groups.map(g => {
-    const total = DATA.filter(d => d.group === g).length;
-    const goneG = DATA.filter(d => d.group === g && d.date_gone).length;
+    const total = src.filter(d => d.group === g).length;
+    const goneG = src.filter(d => d.group === g && d.date_gone).length;
     return total ? Math.round(goneG / total * 100) : 0;
   });
   chartInstances['chartGroupRotation'] = new Chart(document.getElementById('chartGroupRotation'), {
@@ -774,30 +821,29 @@ function renderStats() {
       labels: groups.map(getGroupLabel),
       datasets: [{ data: grpRate, backgroundColor: ['#66cec5','#4c9eff','#f1b6f5'], borderWidth: 0 }]
     },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+    options: { responsive: true, maintainAspectRatio: false, layout: { padding: 10 }, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 10, font: { size: 12, weight: 600 } } } } }
   });
 
-  // Focus: group breakdown
+  // Focus: group
   destroyChart('chartFocusGroup');
-  const focusGroupData = groups.map(g => DATA.filter(d => FOCUS_SIZES.includes(d.size) && d.group === g).length);
   chartInstances['chartFocusGroup'] = new Chart(document.getElementById('chartFocusGroup'), {
     type: 'bar',
     data: {
       labels: groups.map(getGroupLabel),
       datasets: [
-        { label: '1LDK', data: groups.map(g => DATA.filter(d => d.size==='1LDK' && d.group===g).length), backgroundColor: '#ff81d4', borderRadius: 8 },
-        { label: '2DK', data: groups.map(g => DATA.filter(d => d.size==='2DK' && d.group===g).length), backgroundColor: '#4c9eff', borderRadius: 8 }
+        { label: '1LDK', data: groups.map(g => src.filter(d => d.size==='1LDK' && d.group===g).length), backgroundColor: '#ff81d4', borderRadius: 8 },
+        { label: '2DK', data: groups.map(g => src.filter(d => d.size==='2DK' && d.group===g).length), backgroundColor: '#4c9eff', borderRadius: 8 }
       ]
     },
-    options: chartOpts('棟群')
+    options: chartOpts()
   });
 
   // Focus: DOW
   destroyChart('chartFocusDow');
   const focusDow1 = [0,0,0,0,0,0,0];
   const focusDow2 = [0,0,0,0,0,0,0];
-  DATA.filter(d => d.size==='1LDK' && d.date_appeared).forEach(d => focusDow1[new Date(d.date_appeared).getDay()]++);
-  DATA.filter(d => d.size==='2DK' && d.date_appeared).forEach(d => focusDow2[new Date(d.date_appeared).getDay()]++);
+  src.filter(d => d.size==='1LDK' && d.date_appeared).forEach(d => focusDow1[new Date(d.date_appeared).getDay()]++);
+  src.filter(d => d.size==='2DK' && d.date_appeared).forEach(d => focusDow2[new Date(d.date_appeared).getDay()]++);
   chartInstances['chartFocusDow'] = new Chart(document.getElementById('chartFocusDow'), {
     type: 'bar',
     data: {
@@ -807,24 +853,40 @@ function renderStats() {
         { label: '2DK', data: focusDow2, backgroundColor: '#4c9eff', borderRadius: 8 }
       ]
     },
-    options: chartOpts('曜日')
+    options: chartOpts()
+  });
+
+  // Building breakdown
+  destroyChart('chartBuilding');
+  const bldgCounts = BUILDINGS.map(b => src.filter(d => d.building === b).length);
+  const bldgColors = BUILDINGS.map(b => {
+    const g = getGroup(b);
+    return g === 'A' ? '#66cec5' : g === 'B' ? '#4c9eff' : '#f1b6f5';
+  });
+  chartInstances['chartBuilding'] = new Chart(document.getElementById('chartBuilding'), {
+    type: 'bar',
+    data: {
+      labels: BUILDINGS.map(b => b + '号館'),
+      datasets: [{ data: bldgCounts, backgroundColor: bldgColors, borderRadius: 6 }]
+    },
+    options: { ...chartOpts(), plugins: { legend: { display: false } } }
   });
 }
 
-function chartOpts(xLabel, yUnit) {
+function chartOpts(yUnit) {
   return {
     responsive: true,
     maintainAspectRatio: false,
     scales: {
-      x: { grid: { display: false } },
-      y: { beginAtZero: true, ticks: yUnit ? { callback: v => v + yUnit } : {} }
+      x: { grid: { display: false }, ticks: { font: { size: 11, weight: 600 } } },
+      y: { beginAtZero: true, ticks: yUnit ? { callback: v => v + yUnit, font: { size: 11 } } : { font: { size: 11 } } }
     },
     plugins: { legend: { labels: { usePointStyle: true, boxWidth: 8, font: { size: 12, weight: 600 } } } }
   };
 }
 
 // ─── Init ───
-if (TOKEN && GIST_ID) { syncData(); }
+if (TOKEN) { syncData(); }
 else { showSetup(); }
 </script>
 </body>
