@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UR空き追跡</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;600;700;900&display=swap');
+
+:root {
+  --main: #66cec5;
+  --sub: #4c9eff;
+  --accent: #ff81d4;
+  --base: #fcf4f0;
+  --sub-base: #f1b6f5;
+  --dark: #2d2d2d;
+  --mid: #555;
+  --light-text: #fff;
+  --radius: 14px;
+  --shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Inter', 'Noto Sans JP', sans-serif;
+  background: var(--base);
+  color: var(--dark);
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+.header {
+  background: linear-gradient(135deg, var(--main), var(--sub));
+  color: var(--light-text);
+  padding: 24px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 16px rgba(102,206,197,0.3);
+}
+.header h1 { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; }
+.header-right { display: flex; gap: 10px; align-items: center; }
+.header-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+.header-btn:hover { background: rgba(255,255,255,0.35); }
+.header-btn.active { background: rgba(255,255,255,0.95); color: var(--dark); }
+
+/* ── Tabs ── */
+.tab-bar {
+  display: flex;
+  gap: 0;
+  background: #fff;
+  border-bottom: 2px solid #eee;
+  padding: 0 24px;
+}
+.tab {
+  padding: 14px 24px;
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--mid);
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+}
+.tab:hover { color: var(--dark); }
+.tab.active { color: var(--main); border-bottom-color: var(--main); }
+
+/* ── Layout ── */
+.container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+.panel { display: none; }
+.panel.visible { display: block; }
+
+/* ── Cards ── */
+.card {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+}
+.card-title {
+  font-size: 15px;
+  font-weight: 900;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title .dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* ── KPI row ── */
+.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.kpi {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+.kpi-value { font-size: 36px; font-weight: 900; line-height: 1.1; }
+.kpi-label { font-size: 12px; color: var(--mid); margin-top: 4px; font-weight: 600; }
+.kpi.highlight { background: linear-gradient(135deg, var(--main), var(--sub)); color: #fff; }
+.kpi.highlight .kpi-label { color: rgba(255,255,255,0.8); }
+.kpi.accent-bg { background: var(--accent); color: #fff; }
+.kpi.accent-bg .kpi-label { color: rgba(255,255,255,0.8); }
+
+/* ── Form ── */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--mid);
+}
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid #e8e8e8;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+  background: #fff;
+}
+.form-group input:focus, .form-group select:focus {
+  outline: none;
+  border-color: var(--main);
+}
+.btn {
+  padding: 12px 28px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  font-family: inherit;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--main); color: #fff; }
+.btn-primary:hover { box-shadow: 0 4px 16px rgba(102,206,197,0.4); }
+.btn-accent { background: var(--accent); color: #fff; }
+.btn-danger { background: #ff6b6b; color: #fff; }
+.btn-sm { padding: 6px 14px; font-size: 12px; }
+
+/* ── Table ── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th {
+  background: var(--dark);
+  color: #fff;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 700;
+  white-space: nowrap;
+}
+thead th:first-child { border-radius: 10px 0 0 0; }
+thead th:last-child { border-radius: 0 10px 0 0; }
+tbody td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; }
+tbody tr:hover { background: rgba(102,206,197,0.06); }
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.badge-open { background: var(--main); color: #fff; }
+.badge-gone { background: #ccc; color: #666; }
+.badge-focus { background: var(--accent); color: #fff; }
+
+/* ── Charts ── */
+.chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; }
+.chart-box { position: relative; height: 280px; }
+
+/* ── Setup ── */
+.setup-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+.setup-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 460px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+.setup-card h2 { font-size: 20px; font-weight: 900; margin-bottom: 8px; }
+.setup-card p { font-size: 13px; color: var(--mid); margin-bottom: 20px; line-height: 1.6; }
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--dark);
+  color: #fff;
+  padding: 12px 28px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease;
+  z-index: 300;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ── Filter pills ── */
+.filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.pill {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 2px solid #e0e0e0;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.pill:hover { border-color: var(--main); }
+.pill.active { background: var(--main); color: #fff; border-color: var(--main); }
+.pill.focus-type { border-color: var(--accent); }
+.pill.focus-type.active { background: var(--accent); border-color: var(--accent); }
+
+@media (max-width: 600px) {
+  .header { padding: 16px; }
+  .header h1 { font-size: 17px; }
+  .container { padding: 14px; }
+  .card { padding: 16px; }
+  .form-grid { grid-template-columns: 1fr 1fr; }
+  .chart-grid { grid-template-columns: 1fr; }
+  .kpi-row { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- Setup -->
+<div id="setupOverlay" class="setup-overlay" style="display:none;">
+  <div class="setup-card">
+    <h2>🔑 接続設定</h2>
+    <p>GitHub Personal Access Token（gistスコープ）を入力。<br>初回のみ。localStorageに保存される。</p>
+    <div class="form-group" style="margin-bottom:14px;">
+      <label>GitHub PAT</label>
+      <input type="password" id="inputToken" placeholder="ghp_xxxx...">
+    </div>
+    <div class="form-group" style="margin-bottom:14px;">
+      <label>Gist ID（既存があれば。空なら新規作成）</label>
+      <input type="text" id="inputGistId" placeholder="空欄で自動作成">
+    </div>
+    <button class="btn btn-primary" onclick="saveSetup()" style="width:100%;">接続</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<!-- Header -->
+<div class="header">
+  <h1>UR空き追跡</h1>
+  <div class="header-right">
+    <span id="syncStatus" style="font-size:12px;opacity:0.8;">—</span>
+    <button class="header-btn" onclick="syncData()">同期</button>
+    <button class="header-btn" onclick="showSetup()">設定</button>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="tab-bar">
+  <button class="tab active" onclick="switchTab('dashboard')">ダッシュボード</button>
+  <button class="tab" onclick="switchTab('entry')">入力</button>
+  <button class="tab" onclick="switchTab('table')">一覧</button>
+  <button class="tab" onclick="switchTab('stats')">統計</button>
+</div>
+
+<div class="container">
+
+<!-- ━━ Dashboard ━━ -->
+<div id="panel-dashboard" class="panel visible">
+  <div class="kpi-row" id="kpiRow"></div>
+  <div class="chart-grid">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--main)"></span>グループ別 現在空き</div>
+      <div class="chart-box"><canvas id="chartGroupBar"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--accent)"></span>注目間取り推移</div>
+      <div class="chart-box"><canvas id="chartFocusTimeline"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ━━ Entry ━━ -->
+<div id="panel-entry" class="panel">
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--sub)"></span>新規 / 更新</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>号館</label>
+        <select id="fBuilding">
+          <option value="">選択</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>部屋番号</label>
+        <input type="text" id="fRoom" placeholder="301">
+      </div>
+      <div class="form-group">
+        <label>間取り</label>
+        <select id="fSize">
+          <option value="">選択</option>
+          <option>1DK</option><option>1LDK</option>
+          <option>2DK</option><option>2LDK</option>
+          <option>3DK</option><option>3LDK</option>
+          <option>4DK</option><option>4LDK</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>出現日</label>
+        <input type="date" id="fAppeared">
+      </div>
+      <div class="form-group">
+        <label>消滅日（契約済み）</label>
+        <input type="date" id="fGone">
+      </div>
+      <div class="form-group">
+        <label>問い合わせ日</label>
+        <input type="date" id="fInquired">
+      </div>
+    </div>
+    <div style="margin-top:18px; display:flex; gap:10px;">
+      <button class="btn btn-primary" onclick="addEntry()">追加</button>
+      <button class="btn btn-accent" onclick="markGone()">選択を契約済みに</button>
+    </div>
+  </div>
+  <div class="card" id="recentCard">
+    <div class="card-title"><span class="dot" style="background:var(--accent)"></span>最近の入力</div>
+    <div id="recentList"></div>
+  </div>
+</div>
+
+<!-- ━━ Table ━━ -->
+<div id="panel-table" class="panel">
+  <div class="card">
+    <div class="filter-row" id="filterRow"></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>号館</th><th>部屋</th><th>間取り</th><th>階</th><th>グループ</th>
+            <th>出現日</th><th>消滅日</th><th>滞留日数</th><th>状態</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ━━ Stats ━━ -->
+<div id="panel-stats" class="panel">
+  <div class="chart-grid">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--main)"></span>曜日別 空き出現</div>
+      <div class="chart-box"><canvas id="chartDow"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--sub)"></span>階別 回転率</div>
+      <div class="chart-box"><canvas id="chartFloor"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--accent)"></span>間取り別 平均滞留日数</div>
+      <div class="chart-box"><canvas id="chartSizeRetention"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--sub-base)"></span>グループ別 回転率（契約済み率）</div>
+      <div class="chart-box"><canvas id="chartGroupRotation"></canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--accent)"></span>1LDK・2DK 専用分析</div>
+    <div class="chart-grid">
+      <div class="chart-box"><canvas id="chartFocusGroup"></canvas></div>
+      <div class="chart-box"><canvas id="chartFocusDow"></canvas></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+// ─── State ───
+let DATA = [];
+let GIST_ID = localStorage.getItem('ur_gist_id') || '';
+let TOKEN = localStorage.getItem('ur_token') || '';
+const FILENAME = 'ur_data.json';
+const BUILDINGS = [1,2,3,4,5,6,7,8,11,12,13,14,15,16,17,18,19,21,22,23,24];
+const FOCUS_SIZES = ['1LDK','2DK'];
+
+function getGroup(b) {
+  if (b >= 1 && b <= 8) return 'A';
+  if (b >= 11 && b <= 19) return 'B';
+  return 'C';
+}
+function getGroupLabel(g) { return {A:'A棟群 (1-8)', B:'B棟群 (11-19)', C:'C棟群 (21-24)'}[g]; }
+function getFloor(room) { return parseInt(String(room).charAt(0)) || 1; }
+function daysBetween(a, b) {
+  if (!a) return null;
+  const end = b ? new Date(b) : new Date();
+  return Math.max(0, Math.round((end - new Date(a)) / 86400000));
+}
+function dowName(d) { return ['日','月','火','水','木','金','土'][new Date(d).getDay()]; }
+
+// ─── Init building select ───
+(function(){
+  const sel = document.getElementById('fBuilding');
+  BUILDINGS.forEach(b => {
+    const o = document.createElement('option');
+    o.value = b; o.textContent = b + '号館';
+    sel.appendChild(o);
+  });
+  document.getElementById('fAppeared').valueAsDate = new Date();
+  document.getElementById('fInquired').valueAsDate = new Date();
+})();
+
+// ─── Toast ───
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ─── Tabs ───
+function switchTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('visible'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('visible');
+  event.target.classList.add('active');
+  if (name === 'dashboard') renderDashboard();
+  if (name === 'table') renderTable();
+  if (name === 'stats') renderStats();
+}
+
+// ─── Setup ───
+function showSetup() { document.getElementById('setupOverlay').style.display = 'flex'; }
+function hideSetup() { document.getElementById('setupOverlay').style.display = 'none'; }
+async function saveSetup() {
+  TOKEN = document.getElementById('inputToken').value.trim();
+  GIST_ID = document.getElementById('inputGistId').value.trim();
+  if (!TOKEN) { toast('トークンを入力'); return; }
+  localStorage.setItem('ur_token', TOKEN);
+  if (GIST_ID) {
+    localStorage.setItem('ur_gist_id', GIST_ID);
+    hideSetup();
+    await syncData();
+  } else {
+    // Create new gist
+    try {
+      const res = await fetch('https://api.github.com/gists', {
+        method: 'POST',
+        headers: { 'Authorization': 'token ' + TOKEN, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          description: 'UR Vacancy Tracker Data',
+          public: false,
+          files: { [FILENAME]: { content: '[]' } }
+        })
+      });
+      const g = await res.json();
+      GIST_ID = g.id;
+      localStorage.setItem('ur_gist_id', GIST_ID);
+      toast('Gist作成完了: ' + GIST_ID.slice(0,8) + '...');
+      hideSetup();
+    } catch(e) { toast('Gist作成失敗'); }
+  }
+}
+
+// ─── Sync ───
+async function syncData() {
+  if (!TOKEN || !GIST_ID) { showSetup(); return; }
+  document.getElementById('syncStatus').textContent = '同期中...';
+  try {
+    const res = await fetch('https://api.github.com/gists/' + GIST_ID, {
+      headers: { 'Authorization': 'token ' + TOKEN }
+    });
+    const g = await res.json();
+    const content = g.files[FILENAME]?.content || '[]';
+    DATA = JSON.parse(content);
+    document.getElementById('syncStatus').textContent = '✓ ' + new Date().toLocaleTimeString('ja-JP');
+    renderDashboard();
+    toast('同期完了 (' + DATA.length + '件)');
+  } catch(e) {
+    document.getElementById('syncStatus').textContent = '同期失敗';
+    toast('同期失敗: ' + e.message);
+  }
+}
+
+async function pushData() {
+  if (!TOKEN || !GIST_ID) return;
+  try {
+    await fetch('https://api.github.com/gists/' + GIST_ID, {
+      method: 'PATCH',
+      headers: { 'Authorization': 'token ' + TOKEN, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ files: { [FILENAME]: { content: JSON.stringify(DATA, null, 2) } } })
+    });
+    document.getElementById('syncStatus').textContent = '✓ ' + new Date().toLocaleTimeString('ja-JP');
+  } catch(e) { toast('保存失敗'); }
+}
+
+// ─── Entry ───
+function addEntry() {
+  const b = parseInt(document.getElementById('fBuilding').value);
+  const room = document.getElementById('fRoom').value.trim();
+  const size = document.getElementById('fSize').value;
+  const appeared = document.getElementById('fAppeared').value;
+  const gone = document.getElementById('fGone').value || null;
+  const inquired = document.getElementById('fInquired').value;
+  if (!b || !room || !size || !appeared) { toast('号館・部屋・間取り・出現日は必須'); return; }
+
+  // Check duplicate
+  const existing = DATA.findIndex(d => d.building === b && d.room === room && d.date_appeared === appeared);
+  if (existing >= 0) {
+    DATA[existing] = { ...DATA[existing], size, date_gone: gone, date_inquired: inquired };
+    toast('更新しました');
+  } else {
+    DATA.push({
+      id: Date.now().toString(36),
+      building: b,
+      room: room,
+      size: size,
+      floor: getFloor(room),
+      group: getGroup(b),
+      date_appeared: appeared,
+      date_gone: gone,
+      date_inquired: inquired
+    });
+    toast('追加しました');
+  }
+  pushData();
+  renderRecent();
+}
+
+function markGone() {
+  const b = parseInt(document.getElementById('fBuilding').value);
+  const room = document.getElementById('fRoom').value.trim();
+  if (!b || !room) { toast('号館と部屋番号を指定'); return; }
+  const idx = DATA.findIndex(d => d.building === b && d.room === room && !d.date_gone);
+  if (idx < 0) { toast('該当する空き部屋なし'); return; }
+  DATA[idx].date_gone = new Date().toISOString().split('T')[0];
+  pushData();
+  toast(b + '号館 ' + room + ' → 契約済み');
+  renderRecent();
+}
+
+function deleteEntry(id) {
+  DATA = DATA.filter(d => d.id !== id);
+  pushData();
+  renderTable();
+  toast('削除しました');
+}
+
+function renderRecent() {
+  const el = document.getElementById('recentList');
+  const recent = [...DATA].sort((a,b) => (b.date_appeared||'').localeCompare(a.date_appeared||'')).slice(0,5);
+  if (!recent.length) { el.innerHTML = '<p style="color:#999;font-size:13px;">データなし</p>'; return; }
+  el.innerHTML = recent.map(d => {
+    const isFocus = FOCUS_SIZES.includes(d.size);
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0;">
+      <div>
+        <span style="font-weight:700;">${d.building}号館 ${d.room}</span>
+        <span class="badge ${isFocus?'badge-focus':d.date_gone?'badge-gone':'badge-open'}" style="margin-left:8px;">${d.size}</span>
+      </div>
+      <span style="font-size:12px;color:#999;">${d.date_appeared}</span>
+    </div>`;
+  }).join('');
+}
+
+// ─── Table ───
+let tableFilter = { group: 'all', status: 'all' };
+function renderFilterRow() {
+  const el = document.getElementById('filterRow');
+  el.innerHTML = `
+    <button class="pill ${tableFilter.group==='all'?'active':''}" onclick="tableFilter.group='all';renderTable()">全棟</button>
+    <button class="pill ${tableFilter.group==='A'?'active':''}" onclick="tableFilter.group='A';renderTable()">A棟群</button>
+    <button class="pill ${tableFilter.group==='B'?'active':''}" onclick="tableFilter.group='B';renderTable()">B棟群</button>
+    <button class="pill ${tableFilter.group==='C'?'active':''}" onclick="tableFilter.group='C';renderTable()">C棟群</button>
+    <span style="width:1px;background:#ddd;margin:0 4px;"></span>
+    <button class="pill ${tableFilter.status==='all'?'active':''}" onclick="tableFilter.status='all';renderTable()">全件</button>
+    <button class="pill ${tableFilter.status==='open'?'active':''}" onclick="tableFilter.status='open';renderTable()">空き</button>
+    <button class="pill ${tableFilter.status==='gone'?'active':''}" onclick="tableFilter.status='gone';renderTable()">契約済</button>
+    <span style="width:1px;background:#ddd;margin:0 4px;"></span>
+    <button class="pill focus-type ${tableFilter.status==='focus'?'active':''}" onclick="tableFilter.status='focus';renderTable()">1LDK・2DK</button>
+  `;
+}
+function renderTable() {
+  renderFilterRow();
+  let filtered = [...DATA];
+  if (tableFilter.group !== 'all') filtered = filtered.filter(d => d.group === tableFilter.group);
+  if (tableFilter.status === 'open') filtered = filtered.filter(d => !d.date_gone);
+  if (tableFilter.status === 'gone') filtered = filtered.filter(d => d.date_gone);
+  if (tableFilter.status === 'focus') filtered = filtered.filter(d => FOCUS_SIZES.includes(d.size));
+  filtered.sort((a,b) => a.building - b.building || a.room.localeCompare(b.room));
+
+  const el = document.getElementById('tableBody');
+  if (!filtered.length) { el.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#999;padding:30px;">データなし</td></tr>'; return; }
+  el.innerHTML = filtered.map(d => {
+    const days = daysBetween(d.date_appeared, d.date_gone);
+    const isFocus = FOCUS_SIZES.includes(d.size);
+    const status = d.date_gone ? 'gone' : 'open';
+    return `<tr>
+      <td style="font-weight:700;">${d.building}</td>
+      <td>${d.room}</td>
+      <td><span class="badge ${isFocus?'badge-focus':''}">${d.size}</span></td>
+      <td>${d.floor}F</td>
+      <td>${d.group}</td>
+      <td>${d.date_appeared||'—'}</td>
+      <td>${d.date_gone||'—'}</td>
+      <td style="font-weight:700;">${days !== null ? days+'日' : '—'}</td>
+      <td><span class="badge badge-${status}">${status==='open'?'空き':'済'}</span></td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteEntry('${d.id}')">×</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── Dashboard ───
+let chartInstances = {};
+function destroyChart(id) { if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; } }
+
+function renderDashboard() {
+  // KPIs
+  const open = DATA.filter(d => !d.date_gone);
+  const gone = DATA.filter(d => d.date_gone);
+  const focusOpen = open.filter(d => FOCUS_SIZES.includes(d.size));
+  const avgDays = gone.length ? Math.round(gone.reduce((s,d) => s + (daysBetween(d.date_appeared,d.date_gone)||0), 0) / gone.length) : '—';
+
+  document.getElementById('kpiRow').innerHTML = `
+    <div class="kpi highlight"><div class="kpi-value">${open.length}</div><div class="kpi-label">現在空き</div></div>
+    <div class="kpi accent-bg"><div class="kpi-value">${focusOpen.length}</div><div class="kpi-label">1LDK・2DK 空き</div></div>
+    <div class="kpi"><div class="kpi-value">${gone.length}</div><div class="kpi-label">契約済み累計</div></div>
+    <div class="kpi"><div class="kpi-value">${avgDays}</div><div class="kpi-label">平均滞留日数</div></div>
+    <div class="kpi"><div class="kpi-value">${DATA.length}</div><div class="kpi-label">全記録数</div></div>
+  `;
+
+  // Group bar
+  destroyChart('chartGroupBar');
+  const groups = ['A','B','C'];
+  const groupOpen = groups.map(g => open.filter(d => d.group === g).length);
+  const groupGone = groups.map(g => gone.filter(d => d.group === g).length);
+  chartInstances['chartGroupBar'] = new Chart(document.getElementById('chartGroupBar'), {
+    type: 'bar',
+    data: {
+      labels: groups.map(getGroupLabel),
+      datasets: [
+        { label: '空き', data: groupOpen, backgroundColor: '#66cec5', borderRadius: 8 },
+        { label: '契約済', data: groupGone, backgroundColor: '#e0e0e0', borderRadius: 8 }
+      ]
+    },
+    options: chartOpts('棟群')
+  });
+
+  // Focus timeline
+  destroyChart('chartFocusTimeline');
+  const dates = [...new Set(DATA.map(d => d.date_appeared))].sort();
+  if (dates.length) {
+    const focus1 = dates.map(dt => DATA.filter(d => d.size === '1LDK' && d.date_appeared <= dt && (!d.date_gone || d.date_gone > dt)).length);
+    const focus2 = dates.map(dt => DATA.filter(d => d.size === '2DK' && d.date_appeared <= dt && (!d.date_gone || d.date_gone > dt)).length);
+    chartInstances['chartFocusTimeline'] = new Chart(document.getElementById('chartFocusTimeline'), {
+      type: 'line',
+      data: {
+        labels: dates.map(d => d.slice(5)),
+        datasets: [
+          { label: '1LDK', data: focus1, borderColor: '#ff81d4', backgroundColor: 'rgba(255,129,212,0.1)', fill: true, tension: 0.3, pointRadius: 3 },
+          { label: '2DK', data: focus2, borderColor: '#4c9eff', backgroundColor: 'rgba(76,158,255,0.1)', fill: true, tension: 0.3, pointRadius: 3 }
+        ]
+      },
+      options: chartOpts('日付')
+    });
+  }
+}
+
+// ─── Stats ───
+function renderStats() {
+  const gone = DATA.filter(d => d.date_gone);
+
+  // DOW
+  destroyChart('chartDow');
+  const dowCounts = [0,0,0,0,0,0,0];
+  DATA.forEach(d => { if(d.date_appeared) dowCounts[new Date(d.date_appeared).getDay()]++; });
+  chartInstances['chartDow'] = new Chart(document.getElementById('chartDow'), {
+    type: 'bar',
+    data: {
+      labels: ['日','月','火','水','木','金','土'],
+      datasets: [{ data: dowCounts, backgroundColor: dowCounts.map((_,i) => i===0||i===6 ? '#f1b6f5' : '#66cec5'), borderRadius: 8 }]
+    },
+    options: { ...chartOpts('曜日'), plugins: { legend: { display: false } } }
+  });
+
+  // Floor rotation
+  destroyChart('chartFloor');
+  const floors = [...new Set(DATA.map(d => d.floor))].sort((a,b) => a - b);
+  const floorRate = floors.map(f => {
+    const total = DATA.filter(d => d.floor === f).length;
+    const goneF = DATA.filter(d => d.floor === f && d.date_gone).length;
+    return total ? Math.round(goneF / total * 100) : 0;
+  });
+  chartInstances['chartFloor'] = new Chart(document.getElementById('chartFloor'), {
+    type: 'bar',
+    data: {
+      labels: floors.map(f => f + 'F'),
+      datasets: [{ data: floorRate, backgroundColor: '#4c9eff', borderRadius: 8 }]
+    },
+    options: { ...chartOpts('階', '%'), plugins: { legend: { display: false } } }
+  });
+
+  // Size retention
+  destroyChart('chartSizeRetention');
+  const sizes = ['1DK','1LDK','2DK','2LDK','3DK','3LDK','4DK','4LDK'];
+  const sizeAvg = sizes.map(s => {
+    const items = gone.filter(d => d.size === s);
+    if (!items.length) return 0;
+    return Math.round(items.reduce((sum,d) => sum + (daysBetween(d.date_appeared,d.date_gone)||0), 0) / items.length);
+  });
+  chartInstances['chartSizeRetention'] = new Chart(document.getElementById('chartSizeRetention'), {
+    type: 'bar',
+    data: {
+      labels: sizes,
+      datasets: [{ data: sizeAvg, backgroundColor: sizes.map(s => FOCUS_SIZES.includes(s) ? '#ff81d4' : '#66cec5'), borderRadius: 8 }]
+    },
+    options: { ...chartOpts('間取り', '日'), plugins: { legend: { display: false } } }
+  });
+
+  // Group rotation
+  destroyChart('chartGroupRotation');
+  const groups = ['A','B','C'];
+  const grpRate = groups.map(g => {
+    const total = DATA.filter(d => d.group === g).length;
+    const goneG = DATA.filter(d => d.group === g && d.date_gone).length;
+    return total ? Math.round(goneG / total * 100) : 0;
+  });
+  chartInstances['chartGroupRotation'] = new Chart(document.getElementById('chartGroupRotation'), {
+    type: 'doughnut',
+    data: {
+      labels: groups.map(getGroupLabel),
+      datasets: [{ data: grpRate, backgroundColor: ['#66cec5','#4c9eff','#f1b6f5'], borderWidth: 0 }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+  });
+
+  // Focus: group breakdown
+  destroyChart('chartFocusGroup');
+  const focusGroupData = groups.map(g => DATA.filter(d => FOCUS_SIZES.includes(d.size) && d.group === g).length);
+  chartInstances['chartFocusGroup'] = new Chart(document.getElementById('chartFocusGroup'), {
+    type: 'bar',
+    data: {
+      labels: groups.map(getGroupLabel),
+      datasets: [
+        { label: '1LDK', data: groups.map(g => DATA.filter(d => d.size==='1LDK' && d.group===g).length), backgroundColor: '#ff81d4', borderRadius: 8 },
+        { label: '2DK', data: groups.map(g => DATA.filter(d => d.size==='2DK' && d.group===g).length), backgroundColor: '#4c9eff', borderRadius: 8 }
+      ]
+    },
+    options: chartOpts('棟群')
+  });
+
+  // Focus: DOW
+  destroyChart('chartFocusDow');
+  const focusDow1 = [0,0,0,0,0,0,0];
+  const focusDow2 = [0,0,0,0,0,0,0];
+  DATA.filter(d => d.size==='1LDK' && d.date_appeared).forEach(d => focusDow1[new Date(d.date_appeared).getDay()]++);
+  DATA.filter(d => d.size==='2DK' && d.date_appeared).forEach(d => focusDow2[new Date(d.date_appeared).getDay()]++);
+  chartInstances['chartFocusDow'] = new Chart(document.getElementById('chartFocusDow'), {
+    type: 'bar',
+    data: {
+      labels: ['日','月','火','水','木','金','土'],
+      datasets: [
+        { label: '1LDK', data: focusDow1, backgroundColor: '#ff81d4', borderRadius: 8 },
+        { label: '2DK', data: focusDow2, backgroundColor: '#4c9eff', borderRadius: 8 }
+      ]
+    },
+    options: chartOpts('曜日')
+  });
+}
+
+function chartOpts(xLabel, yUnit) {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, ticks: yUnit ? { callback: v => v + yUnit } : {} }
+    },
+    plugins: { legend: { labels: { usePointStyle: true, boxWidth: 8, font: { size: 12, weight: 600 } } } }
+  };
+}
+
+// ─── Init ───
+if (TOKEN && GIST_ID) { syncData(); }
+else { showSetup(); }
+</script>
+</body>
+</html>
