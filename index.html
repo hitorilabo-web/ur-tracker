@@ -608,6 +608,15 @@ function convertToNormal() {
   renderRecent();
 }
 
+function markGoneById(id) {
+  const idx = DATA.findIndex(d => d.id === id);
+  if (idx < 0) return;
+  DATA[idx].date_gone = new Date().toISOString().split('T')[0];
+  pushData();
+  renderTable();
+  toast(DATA[idx].building + '号館 ' + DATA[idx].room + ' → 契約済み');
+}
+
 function deleteEntry(id) {
   DATA = DATA.filter(d => d.id !== id);
   pushData();
@@ -678,7 +687,10 @@ function renderTable() {
       <td>${d.date_gone||'—'}</td>
       <td style="font-weight:700;">${days !== null ? days+'日' : '—'}</td>
       <td><span class="badge badge-${status}">${status==='open'?'空き':'済'}</span></td>
-      <td><button class="btn btn-danger btn-sm" onclick="deleteEntry('${d.id}')">×</button></td>
+      <td style="white-space:nowrap;">
+        ${!d.date_gone ? '<button class="btn btn-accent btn-sm" onclick="markGoneById(\''+d.id+'\')">契約済</button> ' : ''}
+        <button class="btn btn-danger btn-sm" onclick="deleteEntry('${d.id}')">×</button>
+      </td>
     </tr>`;
   }).join('');
 }
