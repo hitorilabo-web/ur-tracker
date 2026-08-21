@@ -590,6 +590,7 @@ function markGone() {
   if (!b || !room) { toast('号館と部屋番号を指定'); return; }
   const idx = DATA.findIndex(d => d.building === b && d.room === room && !d.date_gone);
   if (idx < 0) { toast('該当する空き部屋なし'); return; }
+  if (!confirm(b + '号館 ' + room + ' を契約済みにしますか？')) return;
   DATA[idx].date_gone = new Date().toISOString().split('T')[0];
   pushData();
   toast(b + '号館 ' + room + ' → 契約済み');
@@ -602,6 +603,7 @@ function convertToNormal() {
   if (!b || !room) { toast('号館と部屋番号を指定'); return; }
   const idx = DATA.findIndex(d => d.building === b && d.room === room && d.type === '特別');
   if (idx < 0) { toast('該当する特別枠なし'); return; }
+  if (!confirm(b + '号館 ' + room + ' を通常に切り替えますか？')) return;
   DATA[idx].type = '通常';
   pushData();
   toast(b + '号館 ' + room + ' → 通常に切替');
@@ -609,15 +611,29 @@ function convertToNormal() {
 }
 
 function markGoneById(id) {
-  const idx = DATA.findIndex(d => d.id === id);
-  if (idx < 0) return;
-  DATA[idx].date_gone = new Date().toISOString().split('T')[0];
+  const d = DATA.find(d => d.id === id);
+  if (!d) return;
+  if (!confirm(d.building + '号館 ' + d.room + '（' + d.size + '）を契約済みにしますか？')) return;
+  d.date_gone = new Date().toISOString().split('T')[0];
   pushData();
   renderTable();
-  toast(DATA[idx].building + '号館 ' + DATA[idx].room + ' → 契約済み');
+  toast(d.building + '号館 ' + d.room + ' → 契約済み');
+}
+
+function undoGone(id) {
+  const d = DATA.find(d => d.id === id);
+  if (!d) return;
+  if (!confirm(d.building + '号館 ' + d.room + ' の契約済みを取り消しますか？')) return;
+  d.date_gone = null;
+  pushData();
+  renderTable();
+  toast(d.building + '号館 ' + d.room + ' → 空きに戻しました');
 }
 
 function deleteEntry(id) {
+  const d = DATA.find(d => d.id === id);
+  if (!d) return;
+  if (!confirm(d.building + '号館 ' + d.room + ' を完全に削除しますか？')) return;
   DATA = DATA.filter(d => d.id !== id);
   pushData();
   renderTable();
@@ -688,7 +704,7 @@ function renderTable() {
       <td style="font-weight:700;">${days !== null ? days+'日' : '—'}</td>
       <td><span class="badge badge-${status}">${status==='open'?'空き':'済'}</span></td>
       <td style="white-space:nowrap;">
-        ${!d.date_gone ? '<button class="btn btn-accent btn-sm" onclick="markGoneById(\''+d.id+'\')">契約済</button> ' : ''}
+        ${!d.date_gone ? '<button class="btn btn-accent btn-sm" onclick="markGoneById(\''+d.id+'\')">契約済</button> ' : '<button class="btn btn-sm" style="background:#aaa;color:#fff;" onclick="undoGone(\''+d.id+'\')">戻す</button> '}
         <button class="btn btn-danger btn-sm" onclick="deleteEntry('${d.id}')">×</button>
       </td>
     </tr>`;
