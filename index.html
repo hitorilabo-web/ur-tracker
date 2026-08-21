@@ -120,7 +120,7 @@ body {
 .kpi.highlight .kpi-label { color: rgba(255,255,255,0.8); }
 .kpi.accent-bg { background: var(--accent); color: #fff; }
 .kpi.accent-bg .kpi-label { color: rgba(255,255,255,0.8); }
-.kpi.special-bg { background: var(--special); color: #fff; }
+.kpi.special-bg { background: #999; color: #fff; }
 .kpi.special-bg .kpi-label { color: rgba(255,255,255,0.8); }
 
 .form-grid {
@@ -163,9 +163,47 @@ body {
 .btn-primary { background: var(--main); color: #fff; }
 .btn-primary:hover { box-shadow: 0 4px 16px rgba(102,206,197,0.4); }
 .btn-accent { background: var(--accent); color: #fff; }
-.btn-special { background: var(--special); color: #fff; }
-.btn-danger { background: #ff6b6b; color: #fff; }
+.btn-special { background: #999; color: #fff; }
 .btn-sm { padding: 6px 14px; font-size: 12px; }
+.btn-edit {
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #ccc;
+  color: #666;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.btn-edit:hover { background: #bbb; }
+.btn-save-row {
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--main);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.btn-cancel-row {
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #eee;
+  color: #888;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.delete-link {
+  font-size: 11px;
+  color: #ccc;
+  cursor: pointer;
+  text-decoration: none;
+  margin-left: 8px;
+}
+.delete-link:hover { color: #ff6b6b; }
 
 .table-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -181,8 +219,8 @@ thead th:first-child { border-radius: 10px 0 0 0; }
 thead th:last-child { border-radius: 0 10px 0 0; }
 tbody td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; }
 tbody tr:hover { background: rgba(102,206,197,0.06); }
-tbody tr.special-row { background: rgba(245,166,35,0.06); }
-tbody tr.special-row:hover { background: rgba(245,166,35,0.12); }
+tbody tr.special-row { background: #f3f3f3; }
+tbody tr.special-row:hover { background: #ececec; }
 .badge {
   display: inline-block;
   padding: 3px 10px;
@@ -193,7 +231,23 @@ tbody tr.special-row:hover { background: rgba(245,166,35,0.12); }
 .badge-open { background: var(--main); color: #fff; }
 .badge-gone { background: #ccc; color: #666; }
 .badge-focus { background: var(--accent); color: #fff; }
-.badge-special { background: var(--special); color: #fff; }
+.badge-special { background: #bbb; color: #fff; }
+
+.edit-input {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: inherit;
+}
+.edit-select {
+  padding: 4px 6px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: inherit;
+}
 
 .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
 .chart-box { position: relative; height: 280px; }
@@ -249,8 +303,8 @@ tbody tr.special-row:hover { background: rgba(245,166,35,0.12); }
 .pill.active { background: var(--main); color: #fff; border-color: var(--main); }
 .pill.focus-type { border-color: var(--accent); }
 .pill.focus-type.active { background: var(--accent); border-color: var(--accent); }
-.pill.special-type { border-color: var(--special); }
-.pill.special-type.active { background: var(--special); border-color: var(--special); }
+.pill.special-type { border-color: #bbb; }
+.pill.special-type.active { background: #bbb; border-color: #bbb; }
 .sep { width: 1px; height: 24px; background: #ddd; }
 
 .toggle-row { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
@@ -263,7 +317,7 @@ tbody tr.special-row:hover { background: rgba(245,166,35,0.12); }
   cursor: pointer;
   transition: background 0.2s;
 }
-.toggle.on { background: var(--special); }
+.toggle.on { background: #999; }
 .toggle::after {
   content: '';
   position: absolute;
@@ -313,16 +367,34 @@ tbody tr.special-row:hover { background: rgba(245,166,35,0.12); }
 </div>
 
 <div class="tab-bar">
-  <button class="tab active" data-tab="dashboard" onclick="switchTab('dashboard',this)">ダッシュボード</button>
-  <button class="tab" data-tab="entry" onclick="switchTab('entry',this)">入力</button>
-  <button class="tab" data-tab="table" onclick="switchTab('table',this)">一覧</button>
-  <button class="tab" data-tab="stats" onclick="switchTab('stats',this)">統計</button>
+  <button class="tab active" onclick="switchTab('list',this)">一覧</button>
+  <button class="tab" onclick="switchTab('overview',this)">全体</button>
+  <button class="tab" onclick="switchTab('entry',this)">入力</button>
+  <button class="tab" onclick="switchTab('detail',this)">個別統計</button>
 </div>
 
 <div class="container">
 
-<!-- Dashboard -->
-<div id="panel-dashboard" class="panel visible">
+<!-- 一覧 -->
+<div id="panel-list" class="panel visible">
+  <div class="card">
+    <div class="filter-row" id="filterRow"></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>区分</th><th>号館</th><th>部屋</th><th>間取り</th><th>階</th><th>グループ</th>
+            <th>出現日</th><th>消滅日</th><th>滞留日数</th><th>状態</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- 全体 -->
+<div id="panel-overview" class="panel">
   <div class="kpi-row" id="kpiRow"></div>
   <div class="chart-grid">
     <div class="card">
@@ -336,7 +408,7 @@ tbody tr.special-row:hover { background: rgba(245,166,35,0.12); }
   </div>
 </div>
 
-<!-- Entry -->
+<!-- 入力 -->
 <div id="panel-entry" class="panel">
   <div class="card">
     <div class="card-title"><span class="dot" style="background:var(--sub)"></span>新規 / 更新</div>
@@ -381,8 +453,6 @@ tbody tr.special-row:hover { background: rgba(245,166,35,0.12); }
     </div>
     <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;">
       <button class="btn btn-primary" onclick="addEntry()">追加</button>
-      <button class="btn btn-accent" onclick="markGone()">選択を契約済みに</button>
-      <button class="btn btn-special" onclick="convertToNormal()">特別→通常に切替</button>
     </div>
   </div>
   <div class="card">
@@ -391,26 +461,8 @@ tbody tr.special-row:hover { background: rgba(245,166,35,0.12); }
   </div>
 </div>
 
-<!-- Table -->
-<div id="panel-table" class="panel">
-  <div class="card">
-    <div class="filter-row" id="filterRow"></div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>区分</th><th>号館</th><th>部屋</th><th>間取り</th><th>階</th><th>グループ</th>
-            <th>出現日</th><th>消滅日</th><th>滞留日数</th><th>状態</th><th></th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- Stats -->
-<div id="panel-stats" class="panel">
+<!-- 個別統計 -->
+<div id="panel-detail" class="panel">
   <div class="toggle-row">
     <span class="toggle-label">特別枠を含む</span>
     <div class="toggle" id="toggleSpecial" onclick="toggleSpecial()"></div>
@@ -449,15 +501,16 @@ tbody tr.special-row:hover { background: rgba(245,166,35,0.12); }
 </div>
 
 <script>
-// ─── Config ───
 const GIST_ID = '5ae498eba5ff2eb1453965f778e8b884';
 const FILENAME = 'ur_data.json';
 const BUILDINGS = [1,2,3,4,5,6,7,8,11,12,13,14,15,16,17,18,19,21,22,23,24];
+const SIZES = ['1DK','1LDK','2DK','2LDK','3DK','3LDK','4DK','4LDK'];
 const FOCUS_SIZES = ['1LDK','2DK'];
 
 let DATA = [];
 let TOKEN = localStorage.getItem('ur_token') || '';
 let includeSpecial = false;
+let editingId = null;
 
 function getGroup(b) {
   if (b >= 1 && b <= 8) return 'A';
@@ -472,7 +525,6 @@ function daysBetween(a, b) {
   return Math.max(0, Math.round((end - new Date(a)) / 86400000));
 }
 
-// Init building select
 (function(){
   const sel = document.getElementById('fBuilding');
   BUILDINGS.forEach(b => {
@@ -484,7 +536,6 @@ function daysBetween(a, b) {
   document.getElementById('fInquired').valueAsDate = new Date();
 })();
 
-// ─── Toast ───
 function toast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -492,19 +543,17 @@ function toast(msg) {
   setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-// ─── Tabs ───
 function switchTab(name, el) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('visible'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('panel-' + name).classList.add('visible');
   if (el) el.classList.add('active');
-  if (name === 'dashboard') renderDashboard();
-  if (name === 'table') renderTable();
-  if (name === 'stats') renderStats();
+  if (name === 'list') renderTable();
+  if (name === 'overview') renderOverview();
+  if (name === 'detail') renderStats();
   if (name === 'entry') renderRecent();
 }
 
-// ─── Setup ───
 function showSetup() { document.getElementById('setupOverlay').style.display = 'flex'; }
 function hideSetup() { document.getElementById('setupOverlay').style.display = 'none'; }
 function saveSetup() {
@@ -515,7 +564,6 @@ function saveSetup() {
   syncData();
 }
 
-// ─── Sync ───
 async function syncData() {
   if (!TOKEN) { showSetup(); return; }
   document.getElementById('syncStatus').textContent = '同期中...';
@@ -527,10 +575,9 @@ async function syncData() {
     const g = await res.json();
     const content = g.files[FILENAME]?.content || '[]';
     DATA = JSON.parse(content);
-    // Migrate: add type field if missing
     DATA.forEach(d => { if (!d.type) d.type = '通常'; });
     document.getElementById('syncStatus').textContent = '✓ ' + new Date().toLocaleTimeString('ja-JP');
-    renderDashboard();
+    renderTable();
     toast('同期完了 (' + DATA.length + '件)');
   } catch(e) {
     document.getElementById('syncStatus').textContent = '同期失敗';
@@ -563,15 +610,13 @@ function addEntry() {
 
   const existing = DATA.findIndex(d => d.building === b && d.room === room && d.date_appeared === appeared);
   if (existing >= 0) {
+    if (!confirm(b + '号館 ' + room + ' を更新しますか？')) return;
     DATA[existing] = { ...DATA[existing], type, size, date_gone: gone, date_inquired: inquired };
     toast('更新しました');
   } else {
     DATA.push({
       id: Date.now().toString(36),
-      type: type,
-      building: b,
-      room: room,
-      size: size,
+      type, building: b, room, size,
       floor: getFloor(room),
       group: getGroup(b),
       date_appeared: appeared,
@@ -584,62 +629,6 @@ function addEntry() {
   renderRecent();
 }
 
-function markGone() {
-  const b = parseInt(document.getElementById('fBuilding').value);
-  const room = document.getElementById('fRoom').value.trim();
-  if (!b || !room) { toast('号館と部屋番号を指定'); return; }
-  const idx = DATA.findIndex(d => d.building === b && d.room === room && !d.date_gone);
-  if (idx < 0) { toast('該当する空き部屋なし'); return; }
-  if (!confirm(b + '号館 ' + room + ' を契約済みにしますか？')) return;
-  DATA[idx].date_gone = new Date().toISOString().split('T')[0];
-  pushData();
-  toast(b + '号館 ' + room + ' → 契約済み');
-  renderRecent();
-}
-
-function convertToNormal() {
-  const b = parseInt(document.getElementById('fBuilding').value);
-  const room = document.getElementById('fRoom').value.trim();
-  if (!b || !room) { toast('号館と部屋番号を指定'); return; }
-  const idx = DATA.findIndex(d => d.building === b && d.room === room && d.type === '特別');
-  if (idx < 0) { toast('該当する特別枠なし'); return; }
-  if (!confirm(b + '号館 ' + room + ' を通常に切り替えますか？')) return;
-  DATA[idx].type = '通常';
-  pushData();
-  toast(b + '号館 ' + room + ' → 通常に切替');
-  renderRecent();
-}
-
-function markGoneById(id) {
-  const d = DATA.find(d => d.id === id);
-  if (!d) return;
-  if (!confirm(d.building + '号館 ' + d.room + '（' + d.size + '）を契約済みにしますか？')) return;
-  d.date_gone = new Date().toISOString().split('T')[0];
-  pushData();
-  renderTable();
-  toast(d.building + '号館 ' + d.room + ' → 契約済み');
-}
-
-function undoGone(id) {
-  const d = DATA.find(d => d.id === id);
-  if (!d) return;
-  if (!confirm(d.building + '号館 ' + d.room + ' の契約済みを取り消しますか？')) return;
-  d.date_gone = null;
-  pushData();
-  renderTable();
-  toast(d.building + '号館 ' + d.room + ' → 空きに戻しました');
-}
-
-function deleteEntry(id) {
-  const d = DATA.find(d => d.id === id);
-  if (!d) return;
-  if (!confirm(d.building + '号館 ' + d.room + ' を完全に削除しますか？')) return;
-  DATA = DATA.filter(d => d.id !== id);
-  pushData();
-  renderTable();
-  toast('削除しました');
-}
-
 function renderRecent() {
   const el = document.getElementById('recentList');
   const recent = [...DATA].sort((a,b) => (b.date_appeared||'').localeCompare(a.date_appeared||'')).slice(0,5);
@@ -649,7 +638,7 @@ function renderRecent() {
     const isSpecial = d.type === '特別';
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0;">
       <div>
-        ${isSpecial ? '<span class="badge badge-special" style="margin-right:6px;">特別</span>' : ''}
+        ${isSpecial ? '<span style="font-size:11px;color:#999;margin-right:6px;">特別</span>' : ''}
         <span style="font-weight:700;">${d.building}号館 ${d.room}</span>
         <span class="badge ${isFocus?'badge-focus':d.date_gone?'badge-gone':'badge-open'}" style="margin-left:8px;">${d.size}</span>
       </div>
@@ -660,6 +649,7 @@ function renderRecent() {
 
 // ─── Table ───
 let tableFilter = { group: 'all', status: 'all' };
+
 function renderFilterRow() {
   document.getElementById('filterRow').innerHTML = `
     <button class="pill ${tableFilter.group==='all'?'active':''}" onclick="tableFilter.group='all';renderTable()">全棟</button>
@@ -675,6 +665,17 @@ function renderFilterRow() {
     <button class="pill special-type ${tableFilter.status==='special'?'active':''}" onclick="tableFilter.status='special';renderTable()">特別</button>
   `;
 }
+
+function buildSizeOptions(current) {
+  return SIZES.map(s => `<option ${s===current?'selected':''}>${s}</option>`).join('');
+}
+function buildBuildingOptions(current) {
+  return BUILDINGS.map(b => `<option value="${b}" ${b===current?'selected':''}>${b}</option>`).join('');
+}
+function buildTypeOptions(current) {
+  return ['通常','特別'].map(t => `<option ${t===current?'selected':''}>${t}</option>`).join('');
+}
+
 function renderTable() {
   renderFilterRow();
   let filtered = [...DATA];
@@ -686,14 +687,21 @@ function renderTable() {
   filtered.sort((a,b) => a.building - b.building || a.room.localeCompare(b.room));
 
   const el = document.getElementById('tableBody');
-  if (!filtered.length) { el.innerHTML = '<tr><td colspan="11" style="text-align:center;color:#999;padding:30px;">データなし</td></tr>'; return; }
+  if (!filtered.length) {
+    el.innerHTML = '<tr><td colspan="11" style="text-align:center;color:#999;padding:30px;">データなし</td></tr>';
+    return;
+  }
+
   el.innerHTML = filtered.map(d => {
+    if (editingId === d.id) {
+      return renderEditRow(d);
+    }
     const days = daysBetween(d.date_appeared, d.date_gone);
     const isFocus = FOCUS_SIZES.includes(d.size);
     const isSpecial = d.type === '特別';
     const status = d.date_gone ? 'gone' : 'open';
     return `<tr class="${isSpecial?'special-row':''}">
-      <td>${isSpecial ? '<span class="badge badge-special">特別</span>' : '通常'}</td>
+      <td>${isSpecial ? '<span style="font-size:11px;color:#999;">特別</span>' : '通常'}</td>
       <td style="font-weight:700;">${d.building}</td>
       <td>${d.room}</td>
       <td><span class="badge ${isFocus?'badge-focus':''}">${d.size}</span></td>
@@ -703,12 +711,79 @@ function renderTable() {
       <td>${d.date_gone||'—'}</td>
       <td style="font-weight:700;">${days !== null ? days+'日' : '—'}</td>
       <td><span class="badge badge-${status}">${status==='open'?'空き':'済'}</span></td>
-      <td style="white-space:nowrap;">
-        ${!d.date_gone ? '<button class="btn btn-accent btn-sm" onclick="markGoneById(\''+d.id+'\')">契約済</button> ' : '<button class="btn btn-sm" style="background:#aaa;color:#fff;" onclick="undoGone(\''+d.id+'\')">戻す</button> '}
-        <button class="btn btn-danger btn-sm" onclick="deleteEntry('${d.id}')">×</button>
-      </td>
+      <td><button class="btn-edit" onclick="startEdit('${d.id}')">編集</button></td>
     </tr>`;
   }).join('');
+}
+
+function renderEditRow(d) {
+  return `<tr style="background:rgba(76,158,255,0.08);">
+    <td><select class="edit-select" id="edit-type">${buildTypeOptions(d.type)}</select></td>
+    <td><select class="edit-select" id="edit-building">${buildBuildingOptions(d.building)}</select></td>
+    <td><input class="edit-input" id="edit-room" value="${d.room}" style="width:60px;"></td>
+    <td><select class="edit-select" id="edit-size">${buildSizeOptions(d.size)}</select></td>
+    <td colspan="2" style="font-size:11px;color:#999;">${d.floor}F / ${d.group}</td>
+    <td><input class="edit-input" id="edit-appeared" type="date" value="${d.date_appeared||''}"></td>
+    <td><input class="edit-input" id="edit-gone" type="date" value="${d.date_gone||''}"></td>
+    <td colspan="2" style="white-space:nowrap;">
+      <button class="btn-save-row" onclick="saveEdit('${d.id}')">保存</button>
+      <button class="btn-cancel-row" onclick="cancelEdit()">戻す</button>
+      <a class="delete-link" onclick="deleteEntry('${d.id}')">削除</a>
+    </td>
+    <td></td>
+  </tr>`;
+}
+
+function startEdit(id) {
+  editingId = id;
+  renderTable();
+}
+
+function cancelEdit() {
+  editingId = null;
+  renderTable();
+}
+
+function saveEdit(id) {
+  const d = DATA.find(d => d.id === id);
+  if (!d) return;
+  const newType = document.getElementById('edit-type').value;
+  const newBuilding = parseInt(document.getElementById('edit-building').value);
+  const newRoom = document.getElementById('edit-room').value.trim();
+  const newSize = document.getElementById('edit-size').value;
+  const newAppeared = document.getElementById('edit-appeared').value;
+  const newGone = document.getElementById('edit-gone').value || null;
+
+  if (!newBuilding || !newRoom || !newSize || !newAppeared) {
+    toast('号館・部屋・間取り・出現日は必須');
+    return;
+  }
+  if (!confirm(newBuilding + '号館 ' + newRoom + ' を保存しますか？')) return;
+
+  d.type = newType;
+  d.building = newBuilding;
+  d.room = newRoom;
+  d.size = newSize;
+  d.floor = getFloor(newRoom);
+  d.group = getGroup(newBuilding);
+  d.date_appeared = newAppeared;
+  d.date_gone = newGone;
+
+  editingId = null;
+  pushData();
+  renderTable();
+  toast('保存しました');
+}
+
+function deleteEntry(id) {
+  const d = DATA.find(d => d.id === id);
+  if (!d) return;
+  if (!confirm(d.building + '号館 ' + d.room + ' を完全に削除しますか？')) return;
+  DATA = DATA.filter(d => d.id !== id);
+  editingId = null;
+  pushData();
+  renderTable();
+  toast('削除しました');
 }
 
 // ─── Toggle ───
@@ -718,16 +793,15 @@ function toggleSpecial() {
   renderStats();
 }
 
-// ─── Stat helpers ───
 function statData() {
   return includeSpecial ? DATA : DATA.filter(d => d.type !== '特別');
 }
 
-// ─── Dashboard ───
+// ─── Overview (全体) ───
 let chartInstances = {};
 function destroyChart(id) { if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; } }
 
-function renderDashboard() {
+function renderOverview() {
   const all = DATA;
   const normal = all.filter(d => d.type !== '特別');
   const special = all.filter(d => d.type === '特別');
@@ -746,7 +820,6 @@ function renderDashboard() {
     <div class="kpi"><div class="kpi-value">${all.length}</div><div class="kpi-label">全記録数</div></div>
   `;
 
-  // Group bar
   destroyChart('chartGroupBar');
   const groups = ['A','B','C'];
   const groupOpen = groups.map(g => open.filter(d => d.group === g).length);
@@ -763,7 +836,6 @@ function renderDashboard() {
     options: chartOpts()
   });
 
-  // Focus timeline
   destroyChart('chartFocusTimeline');
   const dates = [...new Set(DATA.map(d => d.date_appeared).filter(Boolean))].sort();
   if (dates.length) {
@@ -783,12 +855,11 @@ function renderDashboard() {
   }
 }
 
-// ─── Stats ───
+// ─── 個別統計 ───
 function renderStats() {
   const src = statData();
   const gone = src.filter(d => d.date_gone);
 
-  // DOW
   destroyChart('chartDow');
   const dowCounts = [0,0,0,0,0,0,0];
   src.forEach(d => { if(d.date_appeared) dowCounts[new Date(d.date_appeared).getDay()]++; });
@@ -801,7 +872,6 @@ function renderStats() {
     options: { ...chartOpts(), plugins: { legend: { display: false } } }
   });
 
-  // Floor
   destroyChart('chartFloor');
   const floors = [...new Set(src.map(d => d.floor))].sort((a,b) => a - b);
   const floorRate = floors.map(f => {
@@ -818,10 +888,8 @@ function renderStats() {
     options: { ...chartOpts('%'), plugins: { legend: { display: false } } }
   });
 
-  // Size retention
   destroyChart('chartSizeRetention');
-  const sizes = ['1DK','1LDK','2DK','2LDK','3DK','3LDK','4DK','4LDK'];
-  const sizeAvg = sizes.map(s => {
+  const sizeAvg = SIZES.map(s => {
     const items = gone.filter(d => d.size === s);
     if (!items.length) return 0;
     return Math.round(items.reduce((sum,d) => sum + (daysBetween(d.date_appeared,d.date_gone)||0), 0) / items.length);
@@ -829,13 +897,12 @@ function renderStats() {
   chartInstances['chartSizeRetention'] = new Chart(document.getElementById('chartSizeRetention'), {
     type: 'bar',
     data: {
-      labels: sizes,
-      datasets: [{ data: sizeAvg, backgroundColor: sizes.map(s => FOCUS_SIZES.includes(s) ? '#ff81d4' : '#66cec5'), borderRadius: 8 }]
+      labels: SIZES,
+      datasets: [{ data: sizeAvg, backgroundColor: SIZES.map(s => FOCUS_SIZES.includes(s) ? '#ff81d4' : '#66cec5'), borderRadius: 8 }]
     },
     options: { ...chartOpts('日'), plugins: { legend: { display: false } } }
   });
 
-  // Group rotation doughnut
   destroyChart('chartGroupRotation');
   const groups = ['A','B','C'];
   const grpRate = groups.map(g => {
@@ -852,7 +919,6 @@ function renderStats() {
     options: { responsive: true, maintainAspectRatio: false, layout: { padding: 10 }, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 10, font: { size: 12, weight: 600 } } } } }
   });
 
-  // Focus: group
   destroyChart('chartFocusGroup');
   chartInstances['chartFocusGroup'] = new Chart(document.getElementById('chartFocusGroup'), {
     type: 'bar',
@@ -866,7 +932,6 @@ function renderStats() {
     options: chartOpts()
   });
 
-  // Focus: DOW
   destroyChart('chartFocusDow');
   const focusDow1 = [0,0,0,0,0,0,0];
   const focusDow2 = [0,0,0,0,0,0,0];
@@ -884,7 +949,6 @@ function renderStats() {
     options: chartOpts()
   });
 
-  // Building breakdown
   destroyChart('chartBuilding');
   const bldgCounts = BUILDINGS.map(b => src.filter(d => d.building === b).length);
   const bldgColors = BUILDINGS.map(b => {
@@ -907,13 +971,19 @@ function chartOpts(yUnit) {
     maintainAspectRatio: false,
     scales: {
       x: { grid: { display: false }, ticks: { font: { size: 11, weight: 600 } } },
-      y: { beginAtZero: true, ticks: yUnit ? { callback: v => v + yUnit, font: { size: 11 } } : { font: { size: 11 } } }
+      y: {
+        beginAtZero: true,
+        ticks: {
+          stepSize: 1,
+          callback: yUnit ? function(v) { return Number.isInteger(v) ? v + yUnit : ''; } : function(v) { return Number.isInteger(v) ? v : ''; },
+          font: { size: 11 }
+        }
+      }
     },
     plugins: { legend: { labels: { usePointStyle: true, boxWidth: 8, font: { size: 12, weight: 600 } } } }
   };
 }
 
-// ─── Init ───
 if (TOKEN) { syncData(); }
 else { showSetup(); }
 </script>
